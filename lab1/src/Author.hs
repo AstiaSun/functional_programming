@@ -11,7 +11,7 @@ type Surname = String
 
 getAllAuthors :: IConnection a => a -> IO[(Id, Name, Surname)]
 getAllAuthors connection = do
-    result <- quickQuery' connection query [SQLInteger id]
+    result <- quickQuery' connection query []
     return $ map unpack result
     where
         query = "select * from authors order by id"
@@ -19,8 +19,9 @@ getAllAuthors connection = do
                (aid, BS.unpack name, BS.unpack surname)
             {-unpack x = error $ "Unexpected result: " ++ show x-}
 
-addAuthor :: IConnection a => Name -> Surname -> Id -> IO Bool
-addAuthor name surname connection =
+{-
+addAuthor :: IConnection a => Name -> Surname -> Id -> a -> IO Bool
+addAuthor name surname connection = do
     withTransaction connection (createAuthor' name surname connection)
 
 createAuthor' name surname connection = do
@@ -28,8 +29,8 @@ createAuthor' name surname connection = do
     return $ isChanged == 1
     where query = "insert into authors(name, surname) values (?, ?)"
 
-deleteAuthor :: IConnection a => Id -> IO Bool
+deleteAuthor :: IConnection a => Id -> a -> IO Bool
 deleteAuthor id connection = do
     isChanged <- run connection query [SqlInteger id]
     return $ isChanged == 1
-    where query = "delete from authors where id=?"
+    where query = "delete from authors where id=?"-}
