@@ -25,7 +25,6 @@ CREATE TABLE articles (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
   content VARCHAR NOT NULL,
-  creationDate DATE NOT NULL,
   topicId INT REFERENCES topics(id),
   releaseId INT REFERENCES releases(id)
 );

@@ -6,6 +6,8 @@ import Database.HDBC.PostgreSQL
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Time.LocalTime as LocalTime
 
+class Article where
+
 type Id = Integer
 type Name = String
 type Content = String
@@ -13,53 +15,42 @@ type CreationDate = LocalTime.LocalTime
 type TopicId = Integer
 type ReleaseId = Integer
 
-data Article = Article Id Name Content CreationDate TopicId ReleaseId deriving (Show)
-
-aId :: Article -> Id
-aId (Article aid _ _ _ _ _) = aid
-
-name :: Article -> Name
-name (Article _ aName _ _ _ _) = aName
-
-content :: Article -> Content
-content (Article _ _ c _ _ _) = c
-
-creationDate :: Article -> CreationDate
-creationDate (Article _ _ _ date _ _) = date
-
-topicId :: Article -> TopicId
-topicId (Article _ _ _ _ topic _) = topic
-
-releaseId :: Article -> ReleaseId
-releaseId (Article _ _ _ _ _ release) = release
-
-
-
-getAllArticles :: IConnection a => a -> IO[(Article)]
+getAllArticles :: IConnection a => a -> IO[(Id, Name, Content, TopicId, ReleaseId)]
 getAllArticles connection = do
     result <- quickQuery' connection query[]
     return $ map unpack result
     where
-        query = "select * from articles"
-        unpack[SqlInteger aid, SqlByteString name,
-            SqlByteString content, SqlLocalTime creationDate,
-            SqlInteger topicId, SqlInteger releaseId] =
-            (aid, BS.unpack name, BS.unpack content,
-                creationDate, topicId, releaseId)
+        query = "select id, name, content, topicId, releaseId from articles"
+        unpack[SqlInteger id, SqlByteString name,
+            SqlByteString content, SqlInteger topicId, SqlInteger releaseId] =
+            (id, BS.unpack name, BS.unpack content, topicId, releaseId)
 
-addArticle :: IConnection a => Article -> a -> IO Bool
-addArticle article connection =
-    withTransaction connection (createArticle' article)
+addArticle :: IConnection a => Name -> Content -> TopicId -> ReleaseId -> a -> IO Bool
+addArticle name content topicId releaseId connection =
+    withTransaction connection (createArticle' name content topicId releaseId)
 
-createArticle' article connection = do
+createArticle' name content topicId releaseId connection = do
     isChanged <- run connection query [
-        SqlString name article,
-        SqlString content article,
-        SqlLocalTime creationDate article,
-        SqlInteger topicId article,
-        SqlInteger releaseId article,
-        SqlInteger aId article]
+        SqlString name,
+        SqlString content,
+        SqlInteger topicId,
+        SqlInteger releaseId]
     return $ isChanged == 1
     where
-    query = "insert into articles(name, content, creationDate, topicId, releaseId)" ++
-        " values (?, ?, ?, ?, ?) where id=?"
+        query = "insert into articles(name, content, topicId, releaseId)" ++
+            " values (?, ?, ?, ?)"
+
+getArticleAuthors :: IConnection a => Id -> a -> IO[(Id, Name, Name)]
+getArticleAuthors id connection = do
+    result <- quickQuery' connection query[]
+    return $ map unpack result
+    where
+        query = "select * from authors join articleAuthors on authors.id = articleAuthors.authorId where articleAuthors.articleId=1"
+        unpack [SqlInteger aid, SqlByteString name, SqlByteString surname] =
+            (aid, BS.unpack name, BS.unpack surname)
+
+deleteArticle :: IConnection a => Id -> a -> IO(Bool)
+deleteArticle id connection = do
+    isChanged <- run connection query [SqlInteger id]
+    return $ isChanged == 1
+    where query = "delete from articles where id=?"

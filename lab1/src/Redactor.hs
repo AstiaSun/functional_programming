@@ -35,7 +35,7 @@ updateRedactor id name surname connection =
 update' id name surname connection = do
     isChanged <- run connection query[SqlString name, SqlString surname, SqlInteger id]
     return $ isChanged == 1
-    where query = "update redactors set name=? surname=? where id=?"
+    where query = "update redactors set name=?, surname=? where id=?"
 
 deleteRedactor :: IConnection a => Id -> a -> IO Bool
 deleteRedactor id connection = do
