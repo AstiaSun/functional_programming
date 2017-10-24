@@ -6,8 +6,6 @@ import Database.HDBC.PostgreSQL
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Time.LocalTime as LocalTime
 
-class Article where
-
 type Id = Integer
 type Name = String
 type Content = String
