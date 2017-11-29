@@ -1,0 +1,4 @@
+3
+"Super Machine" :small 300 5 10 "Automated Vehicle" 1 "red"
+"Super Tiny Vehicle" :tiny 20 5 10 "Tiny vehicle" 0 "yellow"
+"Super Big Vehicle" :big 800 5 12 "Awesome vehicle" 0 "red-black"

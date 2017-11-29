@@ -1,0 +1,120 @@
+(defun gui ()
+  (with-ltk ()
+    (let toys-for-little 
+      (list super-ball super-ball super-vehicle super-bear))
+    
+    (setf room-for-little (make-instance 'Room))
+    (createRoom room-for-little toys-for-little 1000)
+
+    (let toys-for-big 
+      (nconc dolls 
+        (list super-ball super-machine super-machine super-constructor)
+      )
+    )
+
+    (setf room-for-big (make-instance 'Room') )
+    (createRoom room-for-big toys-for-big 5000)
+
+
+    (let* ((frame_ (make-instance 'frame))
+            (text-label-helm  (make-instance 'label :master frame_ :text "helm : - "))
+            (text-label-shirt (make-instance 'label :master frame_ :text "shirt : - "))
+            (text-label-armor (make-instance 'label :master frame_ :text "armor : - "))
+            (text-label-foot  (make-instance 'label :master frame_ :text "footwear : - "))
+            (text-label-glove (make-instance 'label :master frame_ :text "gloves : - "))
+            (text-label-legs  (make-instance 'label :master frame_ :text "leggings : - "))
+            (text-label-price (make-instance 'label :master frame_ :text "Price : 0 "))
+            (text-label-bound (make-instance 'label :master frame_ :text "Bounds"))
+
+            (btn-helm     (make-instance 'button :master frame_ :text "Helm"
+                                         :command (lambda()  (if (eq (knight-helm super-knight) super-empty)
+                                                               (onChangeHelm super-knight super-helm text-label-helm "helm : + ")
+                                                               (onChangeHelm super-knight super-empty text-label-helm "helm : - ")
+                                                             )
+                                                        )))
+            (btn-shirt    (make-instance 'button :master frame_ :text "Shirt"
+                                         :command (lambda() (if (eq (knight-shirt super-knight) super-empty)
+                                                              (onChangeShirt super-knight super-shirt text-label-shirt "shirt : + ")
+                                                              (onChangeShirt super-knight super-empty text-label-shirt "shirt : - ")
+                                                              )
+                                                         )))
+            (btn-armor    (make-instance 'button :master frame_ :text "Armor"
+                                         :command (lambda() (if (eq (knight-armor super-knight) super-empty)
+                                                              (onChangeArmor super-knight super-armor text-label-armor "armor : + ")
+                                                              (onChangeArmor super-knight super-empty text-label-armor "armor : - ")
+                                                            )
+                                                         )))
+            (btn-footwear (make-instance 'button :master frame_ :text "Foot"
+                                         :command (lambda() (if (eq (knight-footwear super-knight) super-empty)
+                                                              (onChangeFoot super-knight super-footwear text-label-foot "footwear : + ")
+                                                              (onChangeFoot super-knight super-empty text-label-foot "footwear : - ")
+                                                              ) )))
+            (btn-gloves   (make-instance 'button :master frame_ :text "Gloves"
+                                         :command (lambda() (if (eq (knight-gloves super-knight) super-empty)
+                                                              (onChangeGloves super-knight super-gloves text-label-glove "gloves : + ")
+                                                              (onChangeGloves super-knight super-empty text-label-glove "gloves : - ")
+                                                            )
+                                                         )))
+            (btn-leggings (make-instance 'button :master frame_ :text "Leggings"
+                                         :command (lambda() (if (eq (knight-leggings super-knight) super-empty)
+                                                              (onChangeLegs super-knight super-leggings text-label-legs "leggings : + ")
+                                                              (onChangeLegs super-knight super-empty text-label-legs "leggings : - ")
+                                                             ) )))
+            (btn-dressall (make-instance 'button :master frame_ :text "Dress All"
+                                        :command (lambda()  (setf (text text-label-legs) "leggings : + ")
+                                                            (setf (text text-label-helm) "helm : + ")
+                                                            (setf (text text-label-shirt) "shirt : + ")
+                                                            (setf (text text-label-armor) "armor : + ")
+                                                            (setf (text text-label-foot) "footwear : + ")
+                                                            (setf (text text-label-glove) "gloves : + ")
+                                                            (equipKnight super-knight super-helm super-shirt super-armor super-footwear super-gloves super-leggings)
+                                                            (print super-knight)
+                                                        )))
+            (btn-undress  (make-instance 'button :master frame_ :text "Undress All"
+                                         :command (lambda() (setf (text text-label-legs) "leggings : - ")
+                                                         (setf (text text-label-helm) "helm : - ")
+                                                         (setf (text text-label-shirt) "shirt : - ")
+                                                         (setf (text text-label-armor) "armor : - ")
+                                                         (setf (text text-label-foot) "footwear : - ")
+                                                         (setf (text text-label-glove) "gloves : - ")
+                                                         (deequipKnight super-knight)
+                                                         )))
+            (btn-getprice (make-instance 'button :master frame_ :text "Price"
+                                         :command (lambda() (onCalculate super-knight text-label-price "Price:") )))
+
+
+          )
+          (pack frame_ :padx 270 :pady 210)
+          (pack text-label-helm :padx 20 :pady :3)
+          (pack text-label-shirt :padx 20 :pady :3)
+          (pack text-label-armor :padx 20 :pady :3)
+          (pack text-label-foot :padx 20 :pady :3)
+          (pack text-label-glove :padx 20 :pady :3)
+          (pack text-label-legs :padx 20 :pady :3)
+          (pack text-label-price :padx 20 :pady :5)
+          (pack btn-helm :side :left)
+          (pack btn-shirt :side :left)
+          (pack btn-armor :side :left)
+          (pack btn-footwear :side :left)
+          (pack btn-gloves :side :left)
+          (pack btn-leggings :side :left)
+          (pack btn-undress :side :bottom)
+          (pack btn-dressall :side :bottom)
+          (pack btn-getprice :side :bottom)
+          (configure frame_ :borderwidth 1)
+          (configure text-label-helm :borderwidth 1)
+          (configure text-label-shirt :borderwidth 1)
+          (configure text-label-armor :borderwidth 1)
+          (configure text-label-foot :borderwidth 1)
+          (configure text-label-glove :borderwidth 1)
+          (configure text-label-legs :borderwidth 1)
+          (configure text-label-price :borderwidth 1)
+      ()
+        ;  (configure btn-leggings :background 0.8)
+
+
+    )
+  )
+)
+
+(gui)
